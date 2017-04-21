@@ -40,8 +40,14 @@ tokenized.vec<- mapply(function(strvec) mapply(function(s, wordexists) ifelse(wo
                                                strvec, hunspell_check(strvec)), 
                        tokenized.vec)
 tokenized.vec<- mapply(unname, tokenized.vec)
+# remove empty tokens
+tokenized.vec<- mapply(function(strvec) strvec[ nchar(strvec)>0], tokenized.vec)
 
 # routines (optional):
+
+
+# concatenate
+new.vec<- mapply(function(strvec) paste(strvec, collapse=' '), tokenized.vec)
 
 
 
