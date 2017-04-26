@@ -2,6 +2,7 @@
 library(dplyr)
 library(textmineR)
 library(hunspell)
+library(xlsx)
 
 # What to do?
 
@@ -25,12 +26,9 @@ correct.spellings<- function(strvec) unname(mapply(function(s, wordexists) ifels
 # removal of empty tokens
 remove.empty.tokens<- function(strvec) strvec[ nchar(strvec)>0]
 
-# 2. lower case
-# 3. removal of Roman numerals
-# 4. removal of non-alpha-numerics
-# 5. Spell correction
+# abbreviation handling
+abbrtbl<- read.xlsx('jobtitles_abbreviation.xls', sheetIndex = 1)
 
-# tokenization: stringi::stri_split_boundaries
 
 # Optional:
 # 1. Lemmatization
