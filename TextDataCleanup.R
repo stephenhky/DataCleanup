@@ -4,7 +4,27 @@ library(textmineR)
 library(hunspell)
 
 # What to do?
-# 1. removal of digit-only token
+
+# removal of non-alpha-numeric characters
+remove.nonalphanumerics<- function(tokens) gsub('[^a-zA-Z0-9]+', ' ', tokens)
+
+# removal of digit-only token
+remove.digitonly.tokens<- function(strvec) strvec[!grepl('^\\d+$', strvec)]
+
+# removal of consecutive spaces
+remove.consecutive.spaces<- function(tokens) gsub('\\s+', ' ', tokens)
+
+# removal of Roman numerals
+romannum<- c('i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x')
+remove.roman.numerals<- function(strvec) strvec[ !(strvec %in% romannum)]
+
+# spell corrections
+correct.spellings<- function(strvec) unname(mapply(function(s, wordexists) ifelse(wordexists, s, hunspell_suggest(s)[[1]][1]),
+                                                   strvec, hunspell_check(strvec)))
+
+# removal of empty tokens
+remove.empty.tokens<- function(strvec) strvec[ nchar(strvec)>0]
+
 # 2. lower case
 # 3. removal of Roman numerals
 # 4. removal of non-alpha-numerics
@@ -16,7 +36,7 @@ library(hunspell)
 # 1. Lemmatization
 
 # predefined knowledge
-romannum<- c('i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x')
+
 
 cleanup.text<-function(vec, steps) {
   # routines:
@@ -35,16 +55,14 @@ cleanup.text<-function(vec, steps) {
   new.vec
 }
 
-steps.20170421<- c(function(s) gsub('[^a-zA-Z0-9]+', ' ', s),
-                   function(s) gsub('\\s+', ' ', s),
+steps.20170421<- c(remove.nonalphanumerics,
+                   remove.consecutive.spaces,
                    trimws,
-                   function(strvec) strvec[!grepl('^\\d+$', strvec)],
+                   remove.digitonly.tokens,
                    tolower,
-                   function(strvec) strvec[ !(strvec %in% romannum)],
-                   function(strvec) mapply(function(s, wordexists) ifelse(wordexists, s, hunspell_suggest(s)[[1]][1]),
-                                           strvec, hunspell_check(strvec)),
-                   unname,
-                   function(strvec) strvec[ nchar(strvec)>0])
+                   remove.roman.numerals,
+                   correct.spellings,
+                   remove.empty.tokens)
 
 cleanup.text.20170421<-function(vec) cleanup.text(vec, steps.20170421)
 
