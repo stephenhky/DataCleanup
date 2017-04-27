@@ -27,14 +27,17 @@ correct.spellings<- function(strvec) unname(mapply(function(s, wordexists) ifels
 remove.empty.tokens<- function(strvec) strvec[ nchar(strvec)>0]
 
 # abbreviation handling
-abbrtbl<- read.xlsx('jobtitles_abbreviation.xls', sheetIndex = 1)
-
+abbrtbl<- read.xlsx('jobtitles_abbreviation.xls', sheetIndex = 1, stringsAsFactors=FALSE, header = FALSE) %>%
+  rename(Abbr=X1, Full=X2)
+# types of abbreviation:
+# - RN
+# - R. N.
+# - R.N.
+# - R. N
+# - R.N
 
 # Optional:
 # 1. Lemmatization
-
-# predefined knowledge
-
 
 cleanup.text<-function(vec, steps) {
   # routines:
@@ -64,4 +67,6 @@ steps.20170421<- c(remove.nonalphanumerics,
 
 cleanup.text.20170421<-function(vec) cleanup.text(vec, steps.20170421)
 
-
+cleanup.text.nospecialchar<- function(vec) cleanup.text(vec, c(remove.nonalphanumerics,
+                                                               remove.consecutive.spaces,
+                                                               trimws))
