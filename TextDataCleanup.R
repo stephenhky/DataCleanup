@@ -41,6 +41,10 @@ abbrtbl<- read.xlsx('jobtitles_abbreviation.xls', sheetIndex = 1, stringsAsFacto
 reverse.titles.with.of<- function(strvec) gsub('(\\w+) of (the )?(\\w+\\s)?(\\w+)$', '\\3 \\4 \\1', strvec) %>%
   remove.consecutive.spaces() %>% trimws()
 
+# reversing job title containing (',')
+reverse.titles.with.comma<- function(strvec) gsub('(\\w+\\s)?(\\w+)\\, (\\w+\\s)?(\\w+)', '\\3 \\4 \\1 \\2', strvec) %>%
+  remove.consecutive.spaces() %>% trimws()
+
 # Optional:
 # 1. Lemmatization
 
