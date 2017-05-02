@@ -30,20 +30,37 @@ remove.empty.tokens<- function(strvec) strvec[ nchar(strvec)>0]
 abbrtbl<- read.xlsx('jobtitles_abbreviation.xls', sheetIndex = 1, stringsAsFactors=FALSE, header = FALSE) %>%
   rename(Abbr=X1, Full=X2)
 # types of abbreviation:
-# - RN
+# - RN (normalized)
 # - R. N.
+abbrstyle1<- function(tokens) paste(paste(tokens, collapse = '. '), '.', sep='')
 # - R.N.
+abbrstyle2<- function(tokens) paste(paste(tokens, collapse = '.'), '.', sep='')
 # - R. N
+abbrstyle3<- function(tokens) paste(tokens, collapse = '. ')
 # - R.N
-
+abbrstyle4<- function(tokens) paste(tokens, collapse = '.')
+# Abbr tokenizer
+abbr.tokenize<- function(normabbrs)
+  mapply(function(normabbr, posdatum) {
+    mapply(function(startpos, len) substr(normabbr, startpos, startpos+len-1), posdatum, attr(posdatum, 'match.length'))
+  }, normabbrs, gregexpr('[A-Z]([a-z]+)?', normabbrs))
+# combining
+generate.abbr.morphologies<- function(normabbrs) {
+  tokenss<- abbr.tokenize(normabbrs)
+  mapply(function(fcn) mapply(fcn, tokenss), c(abbrstyle1, abbrstyle2, abbrstyle3, abbrstyle4))
+}
 
 # reversing job title containing ('of the')
-reverse.titles.with.of<- function(strvec) gsub('(\\w+) of (the )?(\\w+\\s)?(\\w+)$', '\\3 \\4 \\1', strvec) %>%
-  remove.consecutive.spaces() %>% trimws()
+reverse.titles.with.of<- function(strvec) 
+  gsub('(\\w+) of (the )?(\\w+\\s)?(\\w+)$', '\\3 \\4 \\1', strvec) %>%
+  remove.consecutive.spaces() %>% 
+  trimws()
 
 # reversing job title containing (',')
-reverse.titles.with.comma<- function(strvec) gsub('(\\w+\\s)?(\\w+)\\, (\\w+\\s)?(\\w+)', '\\3 \\4 \\1 \\2', strvec) %>%
-  remove.consecutive.spaces() %>% trimws()
+reverse.titles.with.comma<- function(strvec) 
+  gsub('(\\w+\\s)?(\\w+)\\, (\\w+\\s)?(\\w+)', '\\3 \\4 \\1 \\2', strvec) %>%
+  remove.consecutive.spaces() %>% 
+  trimws()
 
 # Optional:
 # 1. Lemmatization
