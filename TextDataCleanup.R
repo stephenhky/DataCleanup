@@ -36,10 +36,18 @@ add.boundaries<- function(strrgexpr) {
   corr.strrgexpr<- paste(beginning, strrgexpr, end, sep='')
   gsub('\\.', '\\\\.', corr.strrgexpr)
 }
-normalizeAbbr<- function(title, abbr.variants) {
-  unique(mapply(function(normabbr, variants) {
-    if (is.null(variants)) title else gsub(paste(add.boundaries(variants), collapse='|'), normabbr, title)
+normalizeAbbr.single<- function(title, abbr.variants) {
+  candidates<-unique(mapply(function(normabbr, variants) {
+    if (is.null(variants)) title else trimws(gsub(paste(add.boundaries(variants), collapse='|'), normabbr, paste(title, ' ', sep='')))
   }, names(abbr.variants), abbr.variants))
+  if (length(candidates)==1) {
+    candidates
+  } else {
+    candidates[ which.min(nchar(candidates))]
+  }
+}
+normalize.Abbr<- function(titles, abbr.variants) {
+  mapply(function(title) normalizeAbbr.single(title, abbr.variants), titles)
 }
 
 # reversing job title containing ('of the')
