@@ -28,27 +28,6 @@ remove.empty.tokens<- function(strvec) strvec[ nchar(strvec)>0]
 
 # abbreviation handling
 source('AbbrHandler.R')
-abbr.variants<- generate.abbr.morphologies(abbrtbl$Abbr)
-add.boundaries<- function(strrgexpr) {
-  wordlen<- nchar(strrgexpr)
-  beginning<- ifelse(grepl('[A-Za-z]', substr(strrgexpr, 1, 1)), '\\b', '\\B')
-  end<- ifelse(grepl('[A-Za-z]', substr(strrgexpr, wordlen, wordlen)), '\\b', '\\B')
-  corr.strrgexpr<- paste(beginning, strrgexpr, end, sep='')
-  gsub('\\.', '\\\\.', corr.strrgexpr)
-}
-normalizeAbbr.single<- function(title, abbr.variants) {
-  candidates<-unique(mapply(function(normabbr, variants) {
-    if (is.null(variants)) title else trimws(gsub(paste(add.boundaries(variants), collapse='|'), normabbr, paste(title, ' ', sep='')))
-  }, names(abbr.variants), abbr.variants))
-  if (length(candidates)==1) {
-    candidates
-  } else {
-    candidates[ which.min(nchar(candidates))]
-  }
-}
-normalize.Abbr<- function(titles, abbr.variants) {
-  mapply(function(title) normalizeAbbr.single(title, abbr.variants), titles)
-}
 
 # reversing job title containing ('of the')
 reverse.titles.with.of<- function(strvec) 
