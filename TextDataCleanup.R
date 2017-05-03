@@ -38,7 +38,7 @@ add.boundaries<- function(strrgexpr) {
 }
 normalizeAbbr<- function(title, abbr.variants) {
   unique(mapply(function(normabbr, variants) {
-    if (is.null(variants)) title else gsub(add.boundaries(variants), normabbr, title)
+    if (is.null(variants)) title else gsub(paste(add.boundaries(variants), collapse='|'), normabbr, title)
   }, names(abbr.variants), abbr.variants))
 }
 
